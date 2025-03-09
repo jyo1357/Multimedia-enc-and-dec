@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Encryption & Decryption</title>
+    <style>
+        /* Reset some default styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: #330960;
+            font-size: 1.8rem;
+            margin: 20px 0;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            flex-wrap: wrap;
+        }
+
+        .form-container > div {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="file"],
+        input[type="password"],
+        input[type="text"],
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        input[type="file"] {
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #330960;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2575fc;
+        }
+
+        .response-box {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .response-box a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .response-box a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            width: 100%;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+
+        .history-btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: white;
+            background-color: #330960;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .history-btn:hover {
+            background-color: #2575fc;
+        }
+        
+        nav {
+            background-color: #330960;
+            padding: 10px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            width: 100%;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Logo Styling */
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav div {
+                flex-direction: column;
+                margin-top: 10px;
+            }
+
+            nav a {
+                margin: 10px 0;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+        <nav>
+            <div class="logo"></div>
+            <div>
+                <a href="{% url 'landing' %}">Home</a>
+                <a href="{% url 'video_history' %}">History</a>
+            </div>
+        </nav>
+        
+        <h1>Video Encryption & Decryption</h1>
+
+    <div class="form-container">
+        <!-- Upload and Encrypt Video File -->
+        <div>
+            <h2>Upload and Encrypt Video</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="file">Choose a Video File:</label>
+                <input type="file" name="file" id="file" accept="video/*"required>
+                <br><br>
+                <label for="password">Enter Password:</label>
+                <input type="password" name="password" id="password" required>
+                <br><br>
+                <button type="submit" name="action" value="encrypt">Encrypt Video</button>
+            </form>
+    
+            <!-- Display Encrypted Video File Information -->
+            {% if encrypted_video_path %}
+                <div class="response-box">
+                    <h3>Video Encrypted Successfully!</h3>
+                    <p>Video Encrypted and Stored Securely.</p>
+                    <a href="{% url 'video_download' 'encrypted' encrypted_video_path %}" class="btn btn-primary">
+                        Download Encrypted Video
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    
+        <!-- Decrypt Video -->
+        <div>
+            <h2>Decrypt Video</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="encrypted_video">Choose Your Encrypted Video:</label>
+                <input type="file" name="encrypted_video" id="encrypted_video" accept="video/*"required>
+                <br><br>
+                <label for="decrypt_password">Enter Password:</label>
+                <input type="password" name="password" id="decrypt_password" required>
+                <br><br>
+                <button type="submit" name="action" value="decrypt">Decrypt Video</button>
+            </form>
+    
+            <!-- Display Decryption Result -->
+            {% if decrypted_video_path %}
+                <div class="response-box">
+                    <h3>Success! Video Decrypted</h3>
+                    <p>You can download the decrypted video now:</p>
+                    <a href="{% url 'video_download' 'decrypted' decrypted_video_path %}" class="btn btn-primary" download>
+                        Download Decrypted Video.
+                    </a>
+                </div>
+            {% elif error_message %}
+                <div class="response-box">
+                    <h3 style="color: red;">{{ error_message }}</h3>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <hr>
+    </body>
+</html>

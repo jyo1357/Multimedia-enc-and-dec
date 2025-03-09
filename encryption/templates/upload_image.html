@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Encryption</title>
+    <style>
+        /* Base Reset and Body Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #330960;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center; /* Align to the center */
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            margin: 50px auto;
+        }
+
+        .form-container {
+            width: 50%; /* Center the form */
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #330960;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="file"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #330960;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2575fc;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                width: 90%; /* Adjust for small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">MyApp Logo</div>
+        <div>
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{% url 'image_history' %}">History</a>
+        </div>
+    </nav>
+
+    <!-- Encryption Form -->
+    <div class="container">
+        <div class="form-container">
+            <h1>Upload Image for Encryption</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="image">Select Image:</label>
+                <input type="file" name="image" id="image" accept="image/*" required>
+                
+                <label for="password">Enter Password:</label>
+                <input type="password" name="key" id="key" placeholder="Enter encryption password" required>
+                
+                <button type="submit">Upload and Encrypt</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

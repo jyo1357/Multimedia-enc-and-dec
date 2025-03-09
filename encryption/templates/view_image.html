@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Encrypted and Decrypted Images</title>
+    <style>
+        /* Reset and Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        nav {
+            background-color: #330960;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+
+        h1 {
+            color: #330960;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2.5rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .image-box {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .image-box a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: white;
+            background-color: #2575fc;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .image-box a:hover {
+            background-color: #1a5dbb;
+        }
+
+        .form-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="password"],
+        input[type="file"],
+        button {
+            width: 90%;
+            max-width: 400px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #330960;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2575fc;
+        }
+
+        .message {
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: red;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: green;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">MyApp</div>
+        <div>
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{% url 'image_history' %}">History</a>
+            <a href="{% url 'upload_image' %}">Upload Image</a>
+        </div>
+    </nav>
+
+    <h1>View Encrypted and Decrypted Images</h1>
+
+    <div class="container">
+        <!-- Encrypted Image Section -->
+        <div class="image-box">
+            <h2>Encrypted Image</h2>
+            {% if image.encrypted_image %}
+                <img src="{{ image.encrypted_image.url }}" alt="Encrypted Image">
+                <a href="{{ image.encrypted_image.url }}" download>Download Encrypted Image</a>
+            {% else %}
+                <p class="message">No encrypted image available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Decrypted Image Section -->
+        <div class="image-box">
+            <h2>Decrypted Image</h2>
+            {% if decrypted_image_base64 %}
+                <img src="data:image/png;base64,{{ decrypted_image_base64 }}" alt="Decrypted Image">
+                <a href="data:image/png;base64,{{ decrypted_image_base64 }}" download="decrypted_image.png">Download Decrypted Image</a>
+            {% else %}
+                <p class="message">No decrypted image to display.</p>
+            {% endif %}
+
+            <!-- Decryption Feedback -->
+            {% if decryption_error %}
+                <p class="error-message">{{ decryption_error }}</p>
+            {% elif decryption_success %}
+                <p class="success-message">Image successfully decrypted!</p>
+            {% endif %}
+
+            <!-- Form for Decryption Key -->
+            <div class="form-container">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="image">Upload Image for Decryption:</label>
+                    <input type="file" name="image" id="image" accept="image/*">
+
+                    <label for="key">Enter Key for Decryption:</label>
+                    <input type="password" name="key" id="key" placeholder="Enter decryption key" required>
+
+                    <button type="submit">Decrypt Image</button>
+                </form>
+                <p class="note">Note: Please upload the encrypted image and provide the correct decryption key.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

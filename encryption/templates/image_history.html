@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image History</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #330960;
+        }
+
+        /* Navbar Styling */
+        nav {
+            background-color: #330960;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #330960;
+            color: white;
+        }
+
+        td img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+        }
+
+        td a {
+            color: #330960;
+            text-decoration: none;
+        }
+
+        /* Styling for Delete Button */
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .delete-btn:active {
+            background-color: #e74c3c;
+        }
+
+        .delete-btn:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo"></div>
+        <div>
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{% url 'upload_image' %}">Image</a>
+        </div>
+    </nav>
+
+    <h1>Image History</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Image Name</th>
+                <th>Encrypted Image</th>
+                <th>Password</th>
+                <th>Decrypted Image</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in history %}
+                <tr>
+                    <td>{{ history.original_image.name }}</td>
+                    <td>
+                        <img src="{{ history.encrypted_image.url }}" alt="{{ history.encrypted_image.name }}">
+                    </td>
+                    <td>{{ history.key }}</td>
+    
+                    <td>
+                        {% if history.decrypted_image_base64 %}
+                            <img src="{{ history.original_image.url }}" alt="Decrypted Image">
+                        {% else %}
+                            No Decrypted Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'delete_image_history' history.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this file history?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No history available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
